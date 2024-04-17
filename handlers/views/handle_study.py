@@ -16,8 +16,17 @@ def handle_study(bot, message, next_word=False, back_word=False):
     Returns:
         None
     """
+
     obj_user = get_user_by_id_tg(id_tg=message.from_user.id)
     obj_words = get_all_words_studying(obj_user)
+
+    if not obj_words:
+        bot.send_message(
+            message.chat.id,
+            "На данный момент у вас нету слов для изучения. Вы можете добавить их в разделе 'база знаний' или 'изучение'."
+        )
+
+        return
 
     obj_target_word = get_obj_next_or_default_word(
         bot=bot,
@@ -26,6 +35,11 @@ def handle_study(bot, message, next_word=False, back_word=False):
         next_word=next_word,
         back_word=back_word
     )
+
+    if len(obj_words) < 4:
+        obj_words_add = get_all_words()
+        random.shuffle(obj_words_add)
+        obj_words.extend(obj_words_add[:3])
 
     others = [word.translate for word in random.sample(obj_words, 3)]
     markup = create_keyboard_with_words(obj_target_word, others)
@@ -37,10 +51,11 @@ def handle_study(bot, message, next_word=False, back_word=False):
 
     markup.add(add_word_btn)
     markup.row(back_btn, menu_btn, next_btn)
-
     greeting = f"Выбери перевод слова:\n🇷🇺 {obj_target_word.word}"
+
     bot.send_message(message.chat.id, greeting, reply_markup=markup)
     bot.set_state(message.from_user.id, MyStates.target_word, message.chat.id)
+
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['current_page'] = 'Изучать'
         data['target_word'] = obj_target_word.word

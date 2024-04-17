@@ -21,9 +21,9 @@ def handle_prev_page(bot, message):
         data['num_page'] = new_num_page
 
     if current_page == "Изучение":
-        show_words_page_studying(bot, message, message.chat.id, new_num_page, message.message_id)
+        show_words_page_studying(bot, message, message.chat.id, new_num_page)
     elif current_page == "Изучено":
-        show_words_page_studied(bot, message, message.chat.id, new_num_page, message.message_id)
+        show_words_page_studied(bot, message, message.chat.id, new_num_page)
 
 
 def handle_next_page(bot, message):
@@ -44,6 +44,6 @@ def handle_next_page(bot, message):
         data['num_page'] = new_num_page
 
     if current_page == "Изучение":
-        show_words_page_studying(bot, message, message.chat.id, new_num_page, message.message_id)
+        show_words_page_studying(bot, message, message.chat.id, new_num_page)
     elif current_page == "Изучено":
-        show_words_page_studied(bot, message, message.chat.id, new_num_page, message.message_id)
+        show_words_page_studied(bot, message, message.chat.id, new_num_page)

@@ -1,3 +1,5 @@
+import re
+
 from db.data_handler import *
 from handlers.utils.utils import *
 
@@ -65,6 +67,9 @@ def add_world_studying(bot, message):
         None
     """
     obj_user = get_user_by_id_tg(id_tg=message.from_user.id)
+    obj_studying_words = get_all_words_studying(obj_user=obj_user)
+
+    words_studying = [word.word for word in obj_studying_words]
 
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['action_on_page'] = ''
@@ -73,7 +78,23 @@ def add_world_studying(bot, message):
 
     word_list = []
     for i in words:
-        word_list.append(i.split("-"))
+        # Проверяем, что строка соответствует формату "слово1-слово2"
+        if re.match(r'^\w+-\w+$', i.strip()):
+            word_list.append(i.strip().split("-"))
+        else:
+            bot.send_message(
+                message.chat.id,
+                'Не верно указаны слова. Нажмите на кнопку добавить еще раз и напишите слова.'
+            )
+            return
+
+    if any(word_pair[0] in words_studying or word_pair[1] in words_studying for word_pair in word_list):
+        bot.send_message(
+            message.chat.id,
+            'Одно или оба слова уже находятся в списке изучаемых слов.'
+        )
+        return
+
     save_words_studying_user(words=word_list, obj_user=obj_user)
 
     bot.send_message(message.chat.id, 'Слово успешно добавлено!')
